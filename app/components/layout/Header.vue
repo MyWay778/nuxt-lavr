@@ -7,7 +7,14 @@
 
 <template>
   <header :class="$style.header">
-    <div>Header</div>
+    <div>
+      <NuxtLink to="/">Header</NuxtLink>
+    </div>
+
+    <nav>
+      <NuxtLink to="/posts">Posts</NuxtLink>
+    </nav>
+
     <div v-if="user">
       <span :class="$style.userName">{{ user.login }}</span>
       <button @click="logout">Logout</button>
