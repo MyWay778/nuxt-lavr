@@ -2,7 +2,8 @@ export default defineNuxtPlugin({
   name: 'fetch',
   parallel: true,
   async setup() {
-    const baseURL = 'http://localhost:3001' //todo: of course it can be it env
+    const config = useRuntimeConfig()
+    const baseURL = config.public.baseApiUrl
 
     const appFetch = $fetch.create({
       baseURL,

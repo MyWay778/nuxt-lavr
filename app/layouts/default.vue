@@ -1,5 +1,9 @@
 <template>
   <LayoutHeader />
+  <hr />
   <slot />
-  <footer>Footer</footer>
+  <footer>
+    <hr />
+    Footer
+  </footer>
 </template>

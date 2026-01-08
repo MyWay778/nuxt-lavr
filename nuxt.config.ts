@@ -2,5 +2,15 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: []
+  modules: [],
+  runtimeConfig: {
+    public: {
+      baseApiUrl: 'http://localhost:3001'
+    }
+  },
+  vite: {
+    server: {
+      hmr: false
+    }
+  }
 })
