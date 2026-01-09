@@ -1,11 +1,8 @@
 import { createPostRepository } from '../repository'
 
-export function useFetchPosts() {
+export async function useFetchPosts(key: string = 'posts') {
   const postRepository = createPostRepository(useNuxtApp().$appFetch)
-  const { data, pending } = useAsyncData('posts', () => postRepository.getAll(), { default: () => [] })
-
-  return {
-    posts: data,
-    loading: pending
-  }
+  return useAsyncData(key, () => postRepository.getAll(), {
+    default: () => []
+  })
 }

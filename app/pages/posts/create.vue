@@ -1,32 +1,92 @@
 <script setup lang="ts">
-  function submitHandler() {}
+  definePageMeta({
+    middleware: ['auth']
+  })
+
+  const initialForm = {
+    title: '',
+    content: '',
+    url: ''
+  }
+
+  const form = ref({ ...initialForm })
+  const transliteratedTitle = useTransliterate(() => form.value.title)
+  watchEffect(() => {
+    form.value.url = transliteratedTitle.value
+  })
+  const formRef = useTemplateRef<HTMLFormElement>('form-ref')
+
+  async function submitHandler() {
+    if (!formRef.value) return
+    if (formRef.value.checkValidity()) {
+      try {
+        const response = await useNuxtApp().$api.posts.create(form.value)
+        navigateTo('/posts')
+      } catch (error) {
+        console.warn('Error:', error)
+      }
+    } else {
+      formRef.value.reportValidity()
+    }
+  }
 </script>
 
 <template>
   <main>
     <h1>Create Post Page</h1>
 
-    <form @submit.prevent="submitHandler">
+    <form
+      ref="form-ref"
+      :class="$style.form"
+      @submit.prevent="submitHandler">
       <label>
-        <span>Title</span>
+        <span>Title:&nbsp;</span>
         <input
+          :class="$style.input"
+          v-model="form.title"
           name="title"
-          type="text" />
+          type="text"
+          minlength="5"
+          maxlength="255"
+          required />
       </label>
 
       <label>
-        <span>Content</span>
-        <textarea name="content" />
+        <span>Content:&nbsp;</span>
+        <textarea
+          :class="$style.input"
+          v-model="form.content"
+          name="content"
+          minlength="25"
+          maxlength="255"
+          required />
       </label>
 
       <label>
-        <span>Url</span>
+        <span>Url:&nbsp;</span>
         <input
+          :value="form.url"
           name="title"
-          type="text" />
+          type="text"
+          readonly />
       </label>
 
       <button type="submit">Create</button>
     </form>
   </main>
 </template>
+
+<style module>
+  .form {
+    display: grid;
+    gap: 10px;
+    max-width: 400px;
+  }
+
+  .input:user-invalid {
+    border: 2px solid red;
+  }
+  .input:valid {
+    border: 2px solid green;
+  }
+</style>

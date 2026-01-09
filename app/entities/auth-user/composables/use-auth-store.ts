@@ -42,11 +42,8 @@ export function useAuthStore() {
 
   async function me() {
     if (!user.value) {
-      const token = localStorage.getItem(storageKey)
       try {
-        const response = await $appFetch<AuthMeResponse>('/auth/check', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await $appFetch<AuthMeResponse>('/auth/check')
         if (response.auth && response.user) {
           user.value = response.user
         }
@@ -61,11 +58,16 @@ export function useAuthStore() {
     user.value = null
   }
 
+  function getToken() {
+    return localStorage.getItem(storageKey)
+  }
+
   return {
     user,
     isAuthenticated,
     login,
     logout,
-    me
+    me,
+    getToken
   }
 }

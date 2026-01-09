@@ -3,15 +3,17 @@
   import { PostList } from '~/entities/post/ui'
 
   const { params } = useRoute()
-  const { post, loading } = useFetchPost(params.id)
-  const { posts } = useFetchPosts()
 
+  const { data: post, pending, error } = await useFetchPost(params.id)
+  // usePageErrorHandler(error)
+
+  const { data: posts } = await useFetchPosts()
   const otherPosts = computed(() => posts.value.filter(post => post.id !== Number(params.id)))
 </script>
 
 <template>
   <main>
-    <div v-if="loading">Loading...</div>
+    <div v-if="pending">Loading...</div>
     <div v-else>
       <h1>{{ post?.title }}</h1>
       <p>{{ post?.content }}</p>

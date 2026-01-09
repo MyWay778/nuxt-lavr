@@ -8,11 +8,13 @@
   const form = ref({ ...initForm })
   const errorMessage = ref('')
   const authStore = useAuthStore()
+  const route = useRoute()
 
   // navigate to home page if user is authenticated
   watchEffect(() => {
     if (authStore.isAuthenticated.value) {
-      navigateTo('/')
+      const redirect = (route.query.redirect as string) || '/'
+      navigateTo(redirect)
     }
   })
 

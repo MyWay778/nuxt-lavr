@@ -2,7 +2,7 @@
   import { useFetchPosts } from '~/entities/post/composables'
   import { PostList } from '~/entities/post/ui'
 
-  const { posts, loading } = useFetchPosts()
+  const { data: posts, pending } = await useFetchPosts()
 </script>
 
 <template>
@@ -11,7 +11,7 @@
     <div>
       <NuxtLink to="/posts/create">Create Post</NuxtLink>
     </div>
-    <div v-if="loading">Loading</div>
+    <div v-if="pending">Loading</div>
     <PostList
       v-else
       :posts />

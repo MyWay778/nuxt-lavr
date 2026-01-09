@@ -1,15 +1,11 @@
 import { createPostRepository } from '../repository'
 
-export function useFetchPost(id: MaybeRefOrGetter) {
+export async function useFetchPost(id: MaybeRefOrGetter) {
   const postRepository = createPostRepository(useNuxtApp().$appFetch)
-  const { data, pending, error } = useAsyncData(`post-${toValue(id)}`, () => postRepository.get(toValue(id)), {
+  return useAsyncData(`post-${toValue(id)}`, () => postRepository.get(toValue(id)), {
     default: () => null
+  }).then(res => {
+    usePageErrorHandler(res.error)
+    return res
   })
-
-  usePageErrorHandler(error)
-
-  return {
-    post: data,
-    loading: pending
-  }
 }
