@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import { useCreatePost } from '~/entities/post/composables'
+
   definePageMeta({
     middleware: ['auth']
   })
@@ -6,24 +8,28 @@
   const initialForm = {
     title: '',
     content: '',
-    url: ''
+    url: '' // transliterated from title
   }
 
   const form = ref({ ...initialForm })
+
+  // Url transliteration
   const transliteratedTitle = useTransliterate(() => form.value.title)
   watchEffect(() => {
     form.value.url = transliteratedTitle.value
   })
+
+  // Submit
   const formRef = useTemplateRef<HTMLFormElement>('form-ref')
+  const { errors, create } = useCreatePost()
 
   async function submitHandler() {
     if (!formRef.value) return
+
     if (formRef.value.checkValidity()) {
-      try {
-        const response = await useNuxtApp().$api.posts.create(form.value)
+      const success = await create(form.value)
+      if (success) {
         navigateTo('/posts')
-      } catch (error) {
-        console.warn('Error:', error)
       }
     } else {
       formRef.value.reportValidity()
@@ -44,11 +50,22 @@
         <input
           :class="$style.input"
           v-model="form.title"
+          @update:model-value="
+            () => {
+              errors.title = ''
+              errors.url = ''
+            }
+          "
           name="title"
           type="text"
           minlength="5"
           maxlength="255"
           required />
+        <div
+          :class="$style.error"
+          v-show="errors['content']">
+          {{ errors['title'] }}
+        </div>
       </label>
 
       <label>
@@ -56,10 +73,16 @@
         <textarea
           :class="$style.input"
           v-model="form.content"
+          @update:model-value="errors.content = ''"
           name="content"
-          minlength="25"
+          minlength="2"
           maxlength="255"
           required />
+        <div
+          :class="$style.error"
+          v-show="errors['content']">
+          {{ errors['content'] }}
+        </div>
       </label>
 
       <label>
@@ -69,6 +92,11 @@
           name="title"
           type="text"
           readonly />
+        <div
+          :class="$style.error"
+          v-show="errors['url']">
+          {{ errors['url'] }}
+        </div>
       </label>
 
       <button type="submit">Create</button>
@@ -86,7 +114,12 @@
   .input:user-invalid {
     border: 2px solid red;
   }
+
   .input:valid {
     border: 2px solid green;
+  }
+
+  .error {
+    color: red;
   }
 </style>

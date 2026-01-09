@@ -4,8 +4,7 @@
 
   const { params } = useRoute()
 
-  const { data: post, pending, error } = await useFetchPost(params.id)
-  // usePageErrorHandler(error)
+  const { data: post, pending } = await useFetchPost(params.id)
 
   const { data: posts } = await useFetchPosts()
   const otherPosts = computed(() => posts.value.filter(post => post.id !== Number(params.id)))
