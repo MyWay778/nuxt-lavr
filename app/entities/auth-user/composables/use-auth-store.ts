@@ -1,5 +1,4 @@
 import type { AuthResponse, AuthUser, AuthMeResponse } from '../types'
-import { FetchError } from 'ofetch'
 
 export function useAuthStore() {
   const user = useState<AuthUser | null>('auth-user', () => null)
@@ -8,36 +7,22 @@ export function useAuthStore() {
   const storageKey = 'token'
 
   async function login(login: string, password: string) {
-    try {
-      const response = await $appFetch<AuthResponse>('/auth/login', {
-        method: 'post',
-        body: { login, password },
-        responseType: 'json'
-      })
+    const response = await $appFetch<AuthResponse>('/auth/login', {
+      method: 'post',
+      body: { login, password },
+      responseType: 'json'
+    })
 
-      if (!response.user || !response.token) {
-        console.warn('Auth error')
-        return false
-      }
-
-      localStorage.setItem(storageKey, response.token)
-
-      user.value = response.user
-
-      return true
-    } catch (error) {
-      if (error instanceof FetchError) {
-        const { data } = error
-
-        if (Array.isArray(data) && Array.isArray(data[0])) {
-          if (data[0][1] === 'wrong_credentials') {
-            throw new Error('Неверные логин или пароль')
-          }
-        }
-
-        throw new Error('Ошибка авторизации')
-      }
+    if (!response.user || !response.token) {
+      console.warn('Auth error')
+      return false
     }
+
+    localStorage.setItem(storageKey, response.token)
+
+    user.value = response.user
+
+    return true
   }
 
   async function me() {
@@ -53,9 +38,13 @@ export function useAuthStore() {
     }
   }
 
-  function logout() {
+  function logout(toLogin = false) {
     localStorage.removeItem(storageKey)
     user.value = null
+
+    if (toLogin) {
+      navigateTo('/login')
+    }
   }
 
   function getToken() {

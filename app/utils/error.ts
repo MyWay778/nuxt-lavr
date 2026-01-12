@@ -31,13 +31,17 @@ export function handleValidationError(error: FetchError): ValidationErrorEntry[]
   const errors: ValidationErrorEntry[] = []
 
   if (error.statusCode === 422 && Array.isArray(error.data) && error.data.length) {
-    error.data.forEach(([field, message, details]) => {
+    error.data.forEach(([field, code, details]) => {
       let displayMessage = ''
 
-      if (message === 'len') {
+      if (code === 'len') {
         displayMessage = `Значение должно быть от ${details[0]} до ${details[1]} символов`
-      } else if (message === 'not_unique') {
+      } else if (code === 'not_unique') {
         displayMessage = 'Значение должно быть уникальным'
+      } else if (code === 'wrong_credentials') {
+        displayMessage = 'Неправильный логин или пароль'
+      } else if (code === 'is_null') {
+        displayMessage = 'Значение не должно быть пустым'
       }
 
       if (displayMessage) {

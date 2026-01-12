@@ -3,6 +3,8 @@
 
   const { user, me, logout } = useAuthStore()
   onMounted(me)
+
+  const { isProtected: isProtectedPage } = useIsPageProtected()
 </script>
 
 <template>
@@ -17,7 +19,7 @@
 
     <div v-if="user">
       <span :class="$style.userName">{{ user.login }}</span>
-      <button @click="logout">Logout</button>
+      <button @click="() => logout(isProtectedPage)">Logout</button>
     </div>
     <NuxtLink
       v-else

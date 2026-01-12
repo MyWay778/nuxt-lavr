@@ -8,7 +8,7 @@
 <template>
   <label>
     <span>{{ label }}:&nbsp;</span>
-    <slot></slot>
+    <slot :class="$style.input"></slot>
     <div
       :class="$style.error"
       v-show="error">

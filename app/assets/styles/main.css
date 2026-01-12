@@ -1,0 +1,19 @@
+.gl-form {
+  display: grid;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.gl-error-msg {
+  color: red;
+}
+
+.gl-input {
+  &:user-invalid {
+    border: 2px solid red;
+  }
+
+  &:valid {
+    border: 2px solid green;
+  }
+}

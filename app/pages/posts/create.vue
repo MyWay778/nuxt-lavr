@@ -41,18 +41,18 @@
 
     <form
       ref="form-ref"
-      :class="$style.form"
+      class="gl-form"
       @submit.prevent="submitHandler">
       <div
         v-show="message"
-        :class="$style.message">
+        class="gl-error-msg">
         {{ message }}
       </div>
       <SharedInputWrapper
         label="Title"
         :error="errors['title']">
         <input
-          :class="$style.input"
+          class="gl-input"
           v-model="form.title"
           @update:model-value="
             () => {
@@ -71,7 +71,7 @@
         label="Content"
         :error="errors['content']">
         <textarea
-          :class="$style.input"
+          class="gl-input"
           v-model="form.content"
           @update:model-value="errors.content = ''"
           name="content"
@@ -84,6 +84,7 @@
         label="Url"
         :error="errors['url']">
         <input
+          class="gl-input"
           :value="form.url"
           name="url"
           type="text"
@@ -98,27 +99,3 @@
     </form>
   </main>
 </template>
-
-<style module>
-  .form {
-    display: grid;
-    gap: 10px;
-    max-width: 400px;
-  }
-
-  .input:user-invalid {
-    border: 2px solid red;
-  }
-
-  .input:valid {
-    border: 2px solid green;
-  }
-
-  .error {
-    color: red;
-  }
-
-  .message {
-    color: error;
-  }
-</style>

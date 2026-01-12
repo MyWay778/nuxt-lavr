@@ -5,25 +5,32 @@
     login: '',
     password: ''
   }
-  const form = ref({ ...initForm })
-  const errorMessage = ref('')
+
   const authStore = useAuthStore()
-  const route = useRoute()
+  const {
+    form,
+    errors,
+    pending,
+    message: errorMessage,
+    submit
+  } = useForm({
+    initForm,
+    sendHandler: form => authStore.login(form.login, form.password)
+  })
 
   // navigate to home page if user is authenticated
+  const route = useRoute()
+
   watchEffect(() => {
     if (authStore.isAuthenticated.value) {
       const redirect = (route.query.redirect as string) || '/'
-      navigateTo(redirect)
+      navigateTo(redirect, { replace: true })
     }
   })
 
-  async function submit() {
-    errorMessage.value = ''
-
+  async function submitHandler() {
     try {
-      await authStore.login(form.value.login, form.value.password)
-      form.value = { ...initForm }
+      await submit()
     } catch (error) {
       if (error instanceof Error) {
         errorMessage.value = error.message
@@ -35,26 +42,38 @@
 <template>
   <main>
     <h1>Login page</h1>
-    <form @submit.prevent="submit">
-      <div v-if="errorMessage">{{ errorMessage }}</div>
+    <form
+      class="gl-form"
+      @submit.prevent="submitHandler">
+      <div
+        class="gl-error-msg"
+        v-if="errorMessage">
+        {{ errorMessage }}
+      </div>
 
-      <label>
-        <span>Login</span>
+      <SharedInputWrapper
+        label="Login"
+        :error="errors.login">
         <input
           v-model="form.login"
           name="login"
           type="text" />
-      </label>
+      </SharedInputWrapper>
 
-      <label>
-        <span>Password</span>
+      <SharedInputWrapper
+        label="Password"
+        :error="errors.password">
         <input
           v-model="form.password"
           name="password"
           type="password" />
-      </label>
+      </SharedInputWrapper>
 
-      <button type="submit">Login</button>
+      <button
+        type="submit"
+        :disabled="pending">
+        Login
+      </button>
     </form>
   </main>
 </template>
