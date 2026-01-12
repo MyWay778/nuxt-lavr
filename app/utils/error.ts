@@ -12,13 +12,15 @@ export function handlePageError(error: NuxtError) {
 type ErrorHandler = (error: FetchError) => void
 
 export function handleError(error: unknown, handlers: Record<number, ErrorHandler>) {
-  if (!isFetchError(error)) throw error
+  if (!isFetchError(error)) return error
 
   const status = error.statusCode
-  if (!status) throw error
+  if (!status) return error
 
   if (handlers[status]) {
     handlers[status](error)
+  } else {
+    return error
   }
 }
 

@@ -1,17 +1,18 @@
 <script setup lang="ts">
-  import { useCreatePost } from '~/entities/post/composables'
-
   definePageMeta({
     middleware: ['auth']
   })
 
-  const initialForm = {
+  const initForm = {
     title: '',
     content: '',
     url: '' // transliterated from title
   }
 
-  const form = ref({ ...initialForm })
+  // Submit
+  const formRef = useTemplateRef<HTMLFormElement>('form-ref')
+  const { $api } = useNuxtApp()
+  const { form, errors, message, pending, submit } = useForm({ initForm, sendHandler: $api.posts.create })
 
   // Url transliteration
   const transliteratedTitle = useTransliterate(() => form.value.title)
@@ -19,17 +20,14 @@
     form.value.url = transliteratedTitle.value
   })
 
-  // Submit
-  const formRef = useTemplateRef<HTMLFormElement>('form-ref')
-  const { errors, create } = useCreatePost()
-
   async function submitHandler() {
     if (!formRef.value) return
 
     if (formRef.value.checkValidity()) {
-      const success = await create(form.value)
-      if (success) {
-        navigateTo('/posts')
+      const newPost = await submit()
+
+      if (newPost) {
+        navigateTo(`/posts/${newPost.id}`)
       }
     } else {
       formRef.value.reportValidity()
@@ -45,8 +43,14 @@
       ref="form-ref"
       :class="$style.form"
       @submit.prevent="submitHandler">
-      <label>
-        <span>Title:&nbsp;</span>
+      <div
+        v-show="message"
+        :class="$style.message">
+        {{ message }}
+      </div>
+      <SharedInputWrapper
+        label="Title"
+        :error="errors['title']">
         <input
           :class="$style.input"
           v-model="form.title"
@@ -61,45 +65,36 @@
           minlength="5"
           maxlength="255"
           required />
-        <div
-          :class="$style.error"
-          v-show="errors['content']">
-          {{ errors['title'] }}
-        </div>
-      </label>
+      </SharedInputWrapper>
 
-      <label>
-        <span>Content:&nbsp;</span>
+      <SharedInputWrapper
+        label="Content"
+        :error="errors['content']">
         <textarea
           :class="$style.input"
           v-model="form.content"
           @update:model-value="errors.content = ''"
           name="content"
-          minlength="2"
+          minlength="5"
           maxlength="255"
           required />
-        <div
-          :class="$style.error"
-          v-show="errors['content']">
-          {{ errors['content'] }}
-        </div>
-      </label>
+      </SharedInputWrapper>
 
-      <label>
-        <span>Url:&nbsp;</span>
+      <SharedInputWrapper
+        label="Url"
+        :error="errors['url']">
         <input
           :value="form.url"
-          name="title"
+          name="url"
           type="text"
           readonly />
-        <div
-          :class="$style.error"
-          v-show="errors['url']">
-          {{ errors['url'] }}
-        </div>
-      </label>
+      </SharedInputWrapper>
 
-      <button type="submit">Create</button>
+      <button
+        type="submit"
+        :disabled="pending">
+        Create
+      </button>
     </form>
   </main>
 </template>
@@ -121,5 +116,9 @@
 
   .error {
     color: red;
+  }
+
+  .message {
+    color: error;
   }
 </style>
