@@ -1,9 +1,9 @@
-export function useForm<Form extends Record<string, unknown>, Response, Error>(args: {
-  initForm: Form
+export function useForm<Form extends Record<string, unknown>, Response, Error>(
+  initForm: Form,
   sendHandler: (form: Form) => Promise<Response | Error>
-}) {
-  const form = ref({ ...args.initForm })
-  const errors = ref(Object.keys(args.initForm).reduce((acc, key) => ({ ...acc, [key]: '' }), {})) as Ref<
+) {
+  const form = ref({ ...initForm })
+  const errors = ref(Object.keys(initForm).reduce((acc, key) => ({ ...acc, [key]: '' }), {})) as Ref<
     Record<keyof Form, string>
   >
   const pending = ref(false)
@@ -14,7 +14,7 @@ export function useForm<Form extends Record<string, unknown>, Response, Error>(a
       pending.value = true
       message.value = ''
 
-      return await args.sendHandler(form.value)
+      return await sendHandler(form.value)
     } catch (error) {
       const unhandledError = handleError(error, {
         422: error => {

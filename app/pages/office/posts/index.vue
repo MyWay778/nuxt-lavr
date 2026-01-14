@@ -11,7 +11,7 @@
 
 <template>
   <main>
-    <h1>Posts Page</h1>
+    <h1>My Posts Page</h1>
     <div>
       <NuxtLink :to="{ name: 'office-posts-create' }">Create Post</NuxtLink>
     </div>

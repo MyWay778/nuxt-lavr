@@ -4,7 +4,7 @@ import type { $Fetch, NitroFetchRequest } from 'nitropack'
 
 export function createPostRepository(
   fetch: $Fetch<unknown, NitroFetchRequest>
-): Pick<Repository<Post>, 'getAll' | 'get' | 'create'> & { getMy: () => Promise<Post[]> } {
+): Repository<Post> & { getMy: () => Promise<Post[]> } {
   return {
     getAll() {
       return fetch('/posts')
@@ -19,6 +19,17 @@ export function createPostRepository(
       return fetch('/posts', {
         method: 'POST',
         body: data
+      })
+    },
+    update(id, data) {
+      return fetch(`/posts/${id}`, {
+        method: 'PUT',
+        body: data
+      })
+    },
+    delete(id) {
+      return fetch(`/posts/${id}`, {
+        method: 'DELETE'
       })
     }
   }

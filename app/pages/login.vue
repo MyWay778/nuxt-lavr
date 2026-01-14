@@ -6,19 +6,15 @@
     password: ''
   }
 
-  const { login, isAuthenticated, pending: authPending } = useAuthStore()
+  const { login, isAuthenticated, userChecked } = useAuthStore()
   const {
     form,
     errors,
     pending,
     message: errorMessage,
     submit
-  } = useForm({
-    initForm,
-    sendHandler: form => login(form.login, form.password)
-  })
+  } = useForm(initForm, form => login(form.login, form.password))
 
-  // navigate to home page if user is authenticated
   const route = useRoute()
 
   watchEffect(() => {
@@ -40,44 +36,40 @@
 </script>
 
 <template>
-  <main>
-    <template v-if="authPending">Loading</template>
+  <main v-show="userChecked">
+    <h1>Login page</h1>
+    <form
+      class="gl-form"
+      @submit.prevent="submitHandler">
+      <div
+        class="gl-error-msg"
+        v-if="errorMessage">
+        {{ errorMessage }}
+      </div>
 
-    <template>
-      <h1>Login page</h1>
-      <form
-        class="gl-form"
-        @submit.prevent="submitHandler">
-        <div
-          class="gl-error-msg"
-          v-if="errorMessage">
-          {{ errorMessage }}
-        </div>
+      <SharedInputWrapper
+        label="Login"
+        :error="errors.login">
+        <input
+          v-model="form.login"
+          name="login"
+          type="text" />
+      </SharedInputWrapper>
 
-        <SharedInputWrapper
-          label="Login"
-          :error="errors.login">
-          <input
-            v-model="form.login"
-            name="login"
-            type="text" />
-        </SharedInputWrapper>
+      <SharedInputWrapper
+        label="Password"
+        :error="errors.password">
+        <input
+          v-model="form.password"
+          name="password"
+          type="password" />
+      </SharedInputWrapper>
 
-        <SharedInputWrapper
-          label="Password"
-          :error="errors.password">
-          <input
-            v-model="form.password"
-            name="password"
-            type="password" />
-        </SharedInputWrapper>
-
-        <button
-          type="submit"
-          :disabled="pending">
-          Login
-        </button>
-      </form>
-    </template>
+      <button
+        type="submit"
+        :disabled="pending">
+        Login
+      </button>
+    </form>
   </main>
 </template>

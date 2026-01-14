@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useAuthStore } from '~/entities/auth-user/composables'
 
-  const { user, me, logout, pending: authPending } = useAuthStore()
+  const { user, me, logout, userChecked } = useAuthStore()
   onMounted(me)
 
   const { isProtected: isProtectedPage } = useIsPageProtected()
@@ -23,7 +23,7 @@
       <button @click="() => logout(isProtectedPage)">Logout</button>
     </div>
 
-    <div v-else-if="authPending">
+    <div v-else-if="!userChecked">
       <span>Loading</span>
     </div>
 
