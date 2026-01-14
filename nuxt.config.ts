@@ -8,6 +8,9 @@ export default defineNuxtConfig({
       baseApiUrl: 'http://localhost:3001'
     }
   },
+  routeRules: {
+    '/office/**': { ssr: false }
+  },
   vite: {
     server: {
       hmr: false

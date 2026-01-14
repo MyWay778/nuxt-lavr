@@ -4,10 +4,13 @@ import type { $Fetch, NitroFetchRequest } from 'nitropack'
 
 export function createPostRepository(
   fetch: $Fetch<unknown, NitroFetchRequest>
-): Pick<Repository<Post>, 'getAll' | 'get' | 'create'> {
+): Pick<Repository<Post>, 'getAll' | 'get' | 'create'> & { getMy: () => Promise<Post[]> } {
   return {
     getAll() {
       return fetch('/posts')
+    },
+    getMy() {
+      return fetch('/posts/my')
     },
     get(id) {
       return fetch(`/posts/${id}`)

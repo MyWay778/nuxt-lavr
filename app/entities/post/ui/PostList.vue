@@ -1,7 +1,12 @@
 <script setup lang="ts">
   import type { Post } from '../types'
 
-  const { posts } = defineProps<{ posts: Post[] }>()
+  const { posts, parent = '' } = defineProps<{
+    posts: Post[]
+    parent?: string // parent route
+  }>()
+
+  const parentWithDash = computed(() => (parent ? parent + '-' : ''))
 </script>
 
 <template>
@@ -10,10 +15,10 @@
       v-for="post in posts"
       :class="$style.post"
       :key="post.id">
-      <NuxtLink :to="`/posts/${post.id}`">
+      <NuxtLink :to="{ name: parentWithDash + 'posts-id', params: { id: post.id } }">
         {{ post.title }}
       </NuxtLink>
-      <span>({{ post.User.login }})</span>
+      <span v-if="post.User">({{ post.User.login }})</span>
       <span>{{ toLocalDate(post.createdAt) }}</span>
     </li>
   </ul>

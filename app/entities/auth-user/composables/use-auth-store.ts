@@ -5,6 +5,7 @@ export function useAuthStore() {
   const isAuthenticated = computed(() => Boolean(user.value))
   const { $appFetch } = useNuxtApp()
   const storageKey = 'token'
+  const pending = ref(false)
 
   async function login(login: string, password: string) {
     const response = await $appFetch<AuthResponse>('/auth/login', {
@@ -27,6 +28,8 @@ export function useAuthStore() {
 
   async function me() {
     if (!user.value) {
+      pending.value = true
+
       try {
         const response = await $appFetch<AuthMeResponse>('/auth/check')
         if (response.auth && response.user) {
@@ -34,6 +37,8 @@ export function useAuthStore() {
         }
       } catch {
         // empty
+      } finally {
+        pending.value = false
       }
     }
   }
@@ -54,6 +59,7 @@ export function useAuthStore() {
   return {
     user,
     isAuthenticated,
+    pending,
     login,
     logout,
     me,

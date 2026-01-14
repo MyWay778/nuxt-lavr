@@ -6,7 +6,7 @@
     password: ''
   }
 
-  const authStore = useAuthStore()
+  const { login, isAuthenticated, pending: authPending } = useAuthStore()
   const {
     form,
     errors,
@@ -15,14 +15,14 @@
     submit
   } = useForm({
     initForm,
-    sendHandler: form => authStore.login(form.login, form.password)
+    sendHandler: form => login(form.login, form.password)
   })
 
   // navigate to home page if user is authenticated
   const route = useRoute()
 
   watchEffect(() => {
-    if (authStore.isAuthenticated.value) {
+    if (isAuthenticated.value) {
       const redirect = (route.query.redirect as string) || '/'
       navigateTo(redirect, { replace: true })
     }
@@ -41,39 +41,43 @@
 
 <template>
   <main>
-    <h1>Login page</h1>
-    <form
-      class="gl-form"
-      @submit.prevent="submitHandler">
-      <div
-        class="gl-error-msg"
-        v-if="errorMessage">
-        {{ errorMessage }}
-      </div>
+    <template v-if="authPending">Loading</template>
 
-      <SharedInputWrapper
-        label="Login"
-        :error="errors.login">
-        <input
-          v-model="form.login"
-          name="login"
-          type="text" />
-      </SharedInputWrapper>
+    <template>
+      <h1>Login page</h1>
+      <form
+        class="gl-form"
+        @submit.prevent="submitHandler">
+        <div
+          class="gl-error-msg"
+          v-if="errorMessage">
+          {{ errorMessage }}
+        </div>
 
-      <SharedInputWrapper
-        label="Password"
-        :error="errors.password">
-        <input
-          v-model="form.password"
-          name="password"
-          type="password" />
-      </SharedInputWrapper>
+        <SharedInputWrapper
+          label="Login"
+          :error="errors.login">
+          <input
+            v-model="form.login"
+            name="login"
+            type="text" />
+        </SharedInputWrapper>
 
-      <button
-        type="submit"
-        :disabled="pending">
-        Login
-      </button>
-    </form>
+        <SharedInputWrapper
+          label="Password"
+          :error="errors.password">
+          <input
+            v-model="form.password"
+            name="password"
+            type="password" />
+        </SharedInputWrapper>
+
+        <button
+          type="submit"
+          :disabled="pending">
+          Login
+        </button>
+      </form>
+    </template>
   </main>
 </template>

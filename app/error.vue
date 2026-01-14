@@ -8,5 +8,8 @@
   <div>
     <h1>{{ error.statusCode }}</h1>
     <p>{{ error.message }}</p>
+    <div>
+      <NuxtLink to="/">Home</NuxtLink>
+    </div>
   </div>
 </template>
